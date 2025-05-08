@@ -3,7 +3,7 @@ using Tutorial8.Models.DTOs;
 
 namespace Tutorial8.Services;
 
-public class ClientService(IConfiguration configuration) : IClientService
+public class ClientsService(IConfiguration configuration) : IClientsService
 {
     private readonly string? _connectionString = configuration.GetConnectionString("DefaultConnection");
 
@@ -87,9 +87,24 @@ public class ClientService(IConfiguration configuration) : IClientService
         return clientDto;
     }
 
-    public Task<ClientDTO> PutClient(int id, int tripId)
+    public async Task<string> PutClient(int id, int tripId)
     {
-        throw new NotImplementedException();
+        using (var conn = new SqlConnection(_connectionString))
+        {
+            await conn.OpenAsync();
+            
+            var command =
+                new SqlCommand(
+                    "INSERT INTO Client_Trip (IdClient, IdTrip, RegisteredAt) VALUES (@id, @tripId, @registeredAt)",
+                    conn);
+            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@tripId", tripId);
+            command.Parameters.AddWithValue("@registeredAt", int.Parse(DateTime.Now.ToString("yyyyMMdd")));
+            
+            await command.ExecuteNonQueryAsync();
+        }
+
+        return "Client was successfully assigned to the trip";
     }
 
     public Task<ClientDTO> DeleteClient(int id, int tripId)

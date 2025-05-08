@@ -9,11 +9,13 @@ namespace Tutorial8.Controllers
     [ApiController]
     public class ClientsController : ControllerBase
     {
-        private IClientService _clientService;
+        private IClientsService _clientsService;
+        private ITripsService _tripsService;
 
-        public ClientsController(IClientService clientService)
+        public ClientsController(IClientsService clientsService, ITripsService tripsService)
         {
-            _clientService = clientService;
+            _clientsService = clientsService;
+            _tripsService = tripsService;
         }
         
         // This endpoint returns a list of trips that client had along with information about registration and payment dates
@@ -25,12 +27,12 @@ namespace Tutorial8.Controllers
                 return BadRequest("Invalid number provided");
             }
             
-            if ( !await _clientService.DoesClientExist(id))
+            if ( !await _clientsService.DoesClientExist(id))
             {
-                return NotFound();
+                return NotFound("Client does not exist");
             }
 
-            var trips = await _clientService.GetClientTrips(id);
+            var trips = await _clientsService.GetClientTrips(id);
 
             return trips.Count == 0 ? Ok("Client doesn't have any trips") : Ok(trips);
         }
@@ -39,9 +41,31 @@ namespace Tutorial8.Controllers
         [HttpPost]
         public async Task<IActionResult> PostClient(ClientDTO clientDto)
         {
-            var result = await _clientService.PostClient(clientDto);
+            var result = await _clientsService.PostClient(clientDto);
 
             return Created($"/api/clients/{result.Id}", result);
+        }
+
+        [HttpPut("{id}/trips/{tripId}")]
+        public async Task<IActionResult> PutClient(int id, int tripId)
+        {
+            if (id <= 0 || tripId <= 0)
+            {
+                return BadRequest("Invalid numbers provided");
+            }
+            
+            if ( !await _clientsService.DoesClientExist(id) || !await _tripsService.DoesTripExist(tripId))
+            {
+                return NotFound("Client or trip does not exist");
+            }
+
+            if (await _tripsService.CheckCapacity(tripId))
+            {
+                return BadRequest("Trip has the maximum number of people");
+            }
+
+            var message = await _clientsService.PutClient(id, tripId);
+            return Ok(message);
         }
     }
 }

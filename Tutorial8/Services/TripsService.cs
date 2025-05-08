@@ -128,4 +128,24 @@ public class TripsService(IConfiguration configuration) : ITripsService
 
         return trip;
     }
+
+    public async Task<bool> CheckCapacity(int id)
+    {
+        using (var conn = new SqlConnection(_connectionString))
+        {
+            await conn.OpenAsync();
+            
+            // Select maximum number of people for this trip
+            var maxPeopleCommand= new SqlCommand("SELECT MaxPeople FROM Trip WHERE IdTrip = @id", conn);
+            maxPeopleCommand.Parameters.AddWithValue("@id", id);
+            var maxPeople = Convert.ToInt32(await maxPeopleCommand.ExecuteScalarAsync());
+
+            // Select actual number of people currently on this trip 
+            var actualPeopleCommand = new SqlCommand("SELECT COUNT(IdClient) FROM Client_Trip WHERE IdTrip = @id", conn);
+            actualPeopleCommand.Parameters.AddWithValue("@id", id);
+            var actualPeople = Convert.ToInt32(await actualPeopleCommand.ExecuteScalarAsync());
+
+            return maxPeople == actualPeople;
+        }
+    }
 }
