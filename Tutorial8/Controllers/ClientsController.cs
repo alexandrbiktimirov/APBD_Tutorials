@@ -15,7 +15,8 @@ namespace Tutorial8.Controllers
         {
             _clientService = clientService;
         }
-
+        
+        // This endpoint returns a list of trips that client had along with information about registration and payment dates
         [HttpGet("{id}")]
         public async Task<IActionResult> GetClientTrips(int id)
         {
@@ -32,6 +33,15 @@ namespace Tutorial8.Controllers
             var trips = await _clientService.GetClientTrips(id);
 
             return trips.Count == 0 ? Ok("Client doesn't have any trips") : Ok(trips);
+        }
+        
+        // This endpoint inserts a new client entry into database
+        [HttpPost]
+        public async Task<IActionResult> PostClient(ClientDTO clientDto)
+        {
+            var result = await _clientService.PostClient(clientDto);
+
+            return Created($"/api/clients/{result.Id}", result);
         }
     }
 }
