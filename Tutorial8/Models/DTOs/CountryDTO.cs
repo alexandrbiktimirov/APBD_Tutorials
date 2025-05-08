@@ -1,6 +1,6 @@
 ﻿namespace Tutorial8.Models.DTOs;
 
-public class CountryDTO
+public class CountryDto
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }

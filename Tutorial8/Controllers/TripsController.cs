@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Tutorial8.Services;
 
@@ -15,7 +14,10 @@ namespace Tutorial8.Controllers
             _tripsService = tripsService;
         }
         
-        // This endpoint returns the list of all trips in the database
+        /// <summary>
+        /// This endpoint returns a list of all trips in the database.
+        /// </summary>
+        /// <returns>200 OK.</returns>
         [HttpGet]
         public async Task<IActionResult> GetTrips()
         {
@@ -23,7 +25,10 @@ namespace Tutorial8.Controllers
             return Ok(trips);
         }
         
-        // This endpoint returns a specific trip with an id that user has written
+        /// <summary>
+        /// This endpoint returns a trip with the specified id.
+        /// </summary>
+        /// <returns>200 OK or 404 if not found.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTrip(int id)
         {

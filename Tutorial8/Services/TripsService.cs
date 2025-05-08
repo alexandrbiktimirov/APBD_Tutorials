@@ -7,9 +7,9 @@ public class TripsService(IConfiguration configuration) : ITripsService
 {
     private readonly string? _connectionString = configuration.GetConnectionString("DefaultConnection");
 
-    public async Task<List<TripDTO>> GetTrips()
+    public async Task<List<TripDto>> GetTrips()
     {
-        var trips = new List<TripDTO>();
+        var trips = new List<TripDto>();
 
         using (SqlConnection conn = new SqlConnection(_connectionString))
         {
@@ -23,7 +23,7 @@ public class TripsService(IConfiguration configuration) : ITripsService
             {
                 while (await tripReader.ReadAsync())
                 {
-                    trips.Add(new TripDTO
+                    trips.Add(new TripDto
                     {
                         Id = tripReader.GetInt32(0),
                         Name = tripReader.GetString(1),
@@ -31,7 +31,7 @@ public class TripsService(IConfiguration configuration) : ITripsService
                         DateFrom = tripReader.GetDateTime(3),
                         DateTo = tripReader.GetDateTime(4),
                         MaxPeople = tripReader.GetInt32(5),
-                        Countries = new List<CountryDTO>(),
+                        Countries = new List<CountryDto>(),
                     });
                 }
             }
@@ -54,7 +54,7 @@ public class TripsService(IConfiguration configuration) : ITripsService
                     var trip = trips.FirstOrDefault(t => t.Id == tripId);
                     if (trip != null)
                     {
-                        trip.Countries.Add(new CountryDTO {Name = countryName});
+                        trip.Countries.Add(new CountryDto {Name = countryName});
                     }
                 }
             }
@@ -73,14 +73,14 @@ public class TripsService(IConfiguration configuration) : ITripsService
             var command = new SqlCommand("SELECT 1 FROM Trip WHERE IdTrip = @id", conn);
             command.Parameters.AddWithValue("@id", id);
 
-            var result = await command.ExecuteReaderAsync();
+            var result = await command.ExecuteScalarAsync();
             return result != null;
         }
     }
 
-    public async Task<TripDTO> GetTrip(int id)
+    public async Task<TripDto> GetTrip(int id)
     {
-        TripDTO? trip = null;
+        TripDto? trip = null;
 
         using (SqlConnection conn = new SqlConnection(_connectionString))
         {
@@ -94,7 +94,7 @@ public class TripsService(IConfiguration configuration) : ITripsService
             {
                 if (await tripReader.ReadAsync())
                 {
-                    trip = new TripDTO
+                    trip = new TripDto
                     {
                         Id = tripReader.GetInt32(0),
                         Name = tripReader.GetString(1),
@@ -102,7 +102,7 @@ public class TripsService(IConfiguration configuration) : ITripsService
                         DateFrom = tripReader.GetDateTime(3),
                         DateTo = tripReader.GetDateTime(4),
                         MaxPeople = tripReader.GetInt32(5),
-                        Countries = new List<CountryDTO>(),
+                        Countries = new List<CountryDto>(),
                     };
                 }
             }
@@ -121,7 +121,7 @@ public class TripsService(IConfiguration configuration) : ITripsService
             {
                 while (await countryReader.ReadAsync())
                 {
-                    trip.Countries.Add(new CountryDTO() {Name = countryReader.GetString(1) });
+                    trip.Countries.Add(new CountryDto() {Name = countryReader.GetString(0) });
                 }
             }
         }

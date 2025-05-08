@@ -17,14 +17,14 @@ public class ClientsService(IConfiguration configuration) : IClientsService
             var clientCommand = new SqlCommand("SELECT 1 FROM Client WHERE IdClient = @id", conn);
             clientCommand.Parameters.AddWithValue("@id", id);
 
-            var result = clientCommand.ExecuteReaderAsync();
+            var result = clientCommand.ExecuteScalar();
             return result != null;
         }
     }
     
-    public async Task<List<ClientTripDTO>> GetClientTrips(int id)
+    public async Task<List<ClientTripDto>> GetClientTrips(int id)
     {
-        List<ClientTripDTO> clientTrips = [];
+        List<ClientTripDto> clientTrips = [];
         
         using (var conn = new SqlConnection(_connectionString))
         {
@@ -46,7 +46,7 @@ public class ClientsService(IConfiguration configuration) : IClientsService
             {
                 while (await reader.ReadAsync())
                 {
-                    clientTrips.Add(new ClientTripDTO
+                    clientTrips.Add(new ClientTripDto
                     {
                         Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
@@ -64,7 +64,7 @@ public class ClientsService(IConfiguration configuration) : IClientsService
         return clientTrips;
     }
 
-    public async Task<ClientDTO> PostClient(ClientDTO clientDto)
+    public async Task<ClientDto> PostClient(ClientDto clientDto)
     {
         using (var conn = new SqlConnection(_connectionString))
         {
@@ -93,6 +93,7 @@ public class ClientsService(IConfiguration configuration) : IClientsService
         {
             await conn.OpenAsync();
             
+            // Insert a reservation for a specified client id with specified trip id
             var command =
                 new SqlCommand(
                     "INSERT INTO Client_Trip (IdClient, IdTrip, RegisteredAt) VALUES (@id, @tripId, @registeredAt)",
@@ -107,25 +108,19 @@ public class ClientsService(IConfiguration configuration) : IClientsService
         return "Client was successfully assigned to the trip";
     }
 
-    public async Task<string?> DeleteClient(int id, int tripId)
+    public async Task<int> DeleteClient(int id, int tripId)
     {
         using (var conn = new SqlConnection(_connectionString))
         {
             await conn.OpenAsync();
 
+            // Delete reservation from Client_Trip table with the specified client id and trip id
             var command = new SqlCommand("DELETE FROM Client_Trip WHERE IdClient = @id AND IdTrip = @tripId", conn);
             command.Parameters.AddWithValue("@id", id);
             command.Parameters.AddWithValue("@tripId", tripId);
 
-            try
-            {
-                await command.ExecuteNonQueryAsync();
-                return "Reservation has been successfully deleted";
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            var result = await command.ExecuteNonQueryAsync();
+            return result;
         }
     }
 }

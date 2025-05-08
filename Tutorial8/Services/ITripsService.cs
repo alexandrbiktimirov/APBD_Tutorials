@@ -4,8 +4,8 @@ namespace Tutorial8.Services;
 
 public interface ITripsService
 {
-    Task<List<TripDTO>> GetTrips();
+    Task<List<TripDto>> GetTrips();
     Task<bool> DoesTripExist(int id);
     Task<bool> CheckCapacity(int id);
-    Task<TripDTO> GetTrip(int id);
+    Task<TripDto> GetTrip(int id);
 }
