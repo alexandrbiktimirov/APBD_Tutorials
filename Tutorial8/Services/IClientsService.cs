@@ -8,5 +8,5 @@ public interface IClientsService
     public Task<List<ClientTripDTO>> GetClientTrips(int id);
     public Task<ClientDTO> PostClient(ClientDTO clientDto);
     public Task<string> PutClient(int id, int tripId);
-    public Task<ClientDTO> DeleteClient(int id, int tripId);
+    public Task<string?> DeleteClient(int id, int tripId);
 }

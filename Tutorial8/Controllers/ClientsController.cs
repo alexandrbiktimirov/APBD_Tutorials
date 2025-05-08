@@ -67,5 +67,25 @@ namespace Tutorial8.Controllers
             var message = await _clientsService.PutClient(id, tripId);
             return Ok(message);
         }
+
+        [HttpDelete("{id}/trips/{tripId}")]
+        public async Task<IActionResult> DeleteClient(int id, int tripId)
+        {
+            if (id <= 0 || tripId <= 0)
+            {
+                return BadRequest("Invalid numbers provided");
+            }
+            
+            if ( !await _clientsService.DoesClientExist(id) || !await _tripsService.DoesTripExist(tripId))
+            {
+                return NotFound("Client or trip does not exist");
+            }
+
+            var result = await _clientsService.DeleteClient(id, tripId);
+
+            return result == null
+                ? NotFound("Registration does not exist")
+                : NoContent();
+        }
     }
 }

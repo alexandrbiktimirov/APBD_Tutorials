@@ -107,8 +107,25 @@ public class ClientsService(IConfiguration configuration) : IClientsService
         return "Client was successfully assigned to the trip";
     }
 
-    public Task<ClientDTO> DeleteClient(int id, int tripId)
+    public async Task<string?> DeleteClient(int id, int tripId)
     {
-        throw new NotImplementedException();
+        using (var conn = new SqlConnection(_connectionString))
+        {
+            await conn.OpenAsync();
+
+            var command = new SqlCommand("DELETE FROM Client_Trip WHERE IdClient = @id AND IdTrip = @tripId", conn);
+            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@tripId", tripId);
+
+            try
+            {
+                await command.ExecuteNonQueryAsync();
+                return "Reservation has been successfully deleted";
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
     }
 }
