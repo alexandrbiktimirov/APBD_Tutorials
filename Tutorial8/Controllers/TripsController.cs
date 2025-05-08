@@ -9,19 +9,21 @@ namespace Tutorial8.Controllers
     public class TripsController : ControllerBase
     {
         private readonly ITripsService _tripsService;
-
+        
         public TripsController(ITripsService tripsService)
         {
             _tripsService = tripsService;
         }
-
+        
+        // This endpoint returns the list of all trips in the database
         [HttpGet]
         public async Task<IActionResult> GetTrips()
         {
             var trips = await _tripsService.GetTrips();
             return Ok(trips);
         }
-
+        
+        // This endpoint returns a specific trip with an id that user has written
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTrip(int id)
         {

@@ -14,9 +14,10 @@ public class TripsService(IConfiguration configuration) : ITripsService
         using (SqlConnection conn = new SqlConnection(_connectionString))
         {
             await conn.OpenAsync();
-
+            
+            // Select all the information from Trip table
             var tripCommand =
-                new SqlCommand("SELECT IdTrip, Name, Description, DateFrom, DateTo, MaxPeople FROM Trip", conn);
+                new SqlCommand("SELECT * FROM Trip", conn);
 
             using (var tripReader = await tripCommand.ExecuteReaderAsync())
             {
@@ -34,7 +35,8 @@ public class TripsService(IConfiguration configuration) : ITripsService
                     });
                 }
             }
-
+        
+            // Select countries for each trip
             var countryCommand = new SqlCommand("""
                                             
                                                             SELECT ct.IdTrip, c.Name
@@ -66,7 +68,8 @@ public class TripsService(IConfiguration configuration) : ITripsService
         using (var conn = new SqlConnection(_connectionString))
         {
             await conn.OpenAsync();
-
+            
+            // Select a trip with the specified id
             var command = new SqlCommand("SELECT 1 FROM Trip WHERE IdTrip = @id", conn);
             command.Parameters.AddWithValue("@id", id);
 
@@ -83,6 +86,7 @@ public class TripsService(IConfiguration configuration) : ITripsService
         {
             await conn.OpenAsync();
             
+            // Select all the information about the trip with the specified id
             var tripCommand = new SqlCommand("SELECT * FROM Trip WHERE IdTrip = @id", conn);
             tripCommand.Parameters.AddWithValue("@id", id);
             
@@ -102,12 +106,14 @@ public class TripsService(IConfiguration configuration) : ITripsService
                     };
                 }
             }
-
+            
+            // Select names of countries for each trip
             var countryCommand = new SqlCommand("""
+                                                                SELECT c.Name
+                                                                FROM Country_Trip ct
+                                                                JOIN Country c ON c.IdCountry = ct.IdCountry
+                                                                WHERE ct.IdTrip = @id
                                                 
-                                                                SELECT *
-                                                                FROM Country
-                                                                WHERE IdCountry = @id
                                                 """, conn);
             countryCommand.Parameters.AddWithValue("@id", id);
 
