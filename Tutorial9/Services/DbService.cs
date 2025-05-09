@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
+using Tutorial9.Model.DTOs;
 
 namespace Tutorial9.Services;
 
@@ -10,6 +11,30 @@ public class DbService : IDbService
     public DbService(IConfiguration configuration)
     {
         _configuration = configuration;
+    }
+
+    public async Task<bool> DoesProductExist(int idProduct)
+    {
+        await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        await using SqlCommand command = new SqlCommand("SELECT 1 FROM Product WHERE IdProduct = @id", connection);
+
+        command.Parameters.AddWithValue("@id", idProduct);
+        var result = await command.ExecuteNonQueryAsync();
+        
+        return result == 1;
+    }
+    
+    public async Task<bool> OrderExists(WarehouseDto dto)
+    {
+        await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        await using SqlCommand command = new SqlCommand("SELECT 1 FROM [Order] WHERE IdProduct = @id AND Amount = @amount AND CreatedAt < @createdAt", connection);
+
+        command.Parameters.AddWithValue("@id", dto.IdProduct);
+        command.Parameters.AddWithValue("@amount", dto.Amount);
+        command.Parameters.AddWithValue("@createdAt", dto.CreatedAt);
+
+        var result = await command.ExecuteNonQueryAsync();
+        return result == 1;
     }
     
     public async Task DoSomethingAsync()
