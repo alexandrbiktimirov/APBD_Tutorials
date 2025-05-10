@@ -4,8 +4,9 @@ namespace Tutorial9.Services;
 
 public interface IDbService
 {
-    Task DoSomethingAsync();
+    Task<int> PutProduct(WarehouseDto dto);
     Task ProcedureAsync();
-    Task<bool> DoesProductExist(int idProduct);
-    Task<bool> OrderExists(WarehouseDto dto);
+    Task<int> GetProductPrice(int idProduct);
+    Task<int> GetOrderId(WarehouseDto dto);
+    Task<int> OrderCompleted(WarehouseDto dto);
 }

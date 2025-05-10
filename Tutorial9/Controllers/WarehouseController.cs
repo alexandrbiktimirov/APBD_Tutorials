@@ -1,5 +1,8 @@
+using System.Transactions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.JSInterop.Infrastructure;
+using Tutorial9.Exceptions;
 using Tutorial9.Model.DTOs;
 using Tutorial9.Services;
 
@@ -19,17 +22,30 @@ namespace Tutorial9.Controllers
         [HttpPut]
         public async Task<IActionResult> PutProduct(WarehouseDto dto)
         {
-            if (dto.IdProduct <= 0 || !await _dbService.DoesProductExist(dto.IdProduct))
+            int id;
+            
+            try
             {
-                return BadRequest("Product does not exist");
+                id = await _dbService.PutProduct(dto);
             }
-
-            if (!await _dbService.OrderExists(dto))
+            catch (ProductDoesNotExistException e)
             {
-                return BadRequest("Order does not exist");
+                return BadRequest(e.Message);
+            }
+            catch (OrderDoesNotExistException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (OrderHasBeenCompletedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (TransactionException e)
+            {
+                return StatusCode(500, $"Internal server error: {e.Message}");
             }
             
-            return Ok();
+            return Ok(id);
         }
     }
 }
