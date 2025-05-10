@@ -66,17 +66,36 @@ ALTER TABLE Product_Warehouse ADD CONSTRAINT _Warehouse
 
 GO
 
-INSERT INTO Warehouse(Name, Address)
-VALUES('Warsaw', 'Kwiatowa 12');
+INSERT INTO Warehouse(Name, Address) VALUES
+('Warsaw', 'Kwiatowa 12'),
+('Krakow', 'Zielona 5'),
+('Gdansk', 'Morska 44'),
+('Wroclaw', 'Szafirowa 10'),
+('Lodz', 'Lesna 22');
 
 GO
 
-INSERT INTO Product(Name, Description, Price)
-VALUES ('Abacavir', '', 25.5),
-('Acyclovir', '', 45.0),
-('Allopurinol', '', 30.8);
+INSERT INTO Product(Name, Description, Price) VALUES
+('Abacavir', 'Used for HIV treatment', 25.50),
+('Acyclovir', 'Used for herpes treatment', 45.00),
+('Allopurinol', 'Used for gout treatment', 30.80),
+('Ibuprofen', 'Pain reliever', 15.00),
+('Paracetamol', 'Fever reducer', 12.75);
 
 GO
 
-INSERT INTO "Order"(IdProduct, Amount, CreatedAt)
-VALUES((SELECT IdProduct FROM Product WHERE Name='Abacavir'), 125, GETDATE());
+INSERT INTO "Order"(IdProduct, Amount, CreatedAt) VALUES
+(1, 125, GETDATE()),
+(2, 200, GETDATE()),
+(3, 50, GETDATE()),
+(4, 300, GETDATE()),
+(5, 100, GETDATE());
+
+GO
+
+INSERT INTO Product_Warehouse(IdWarehouse, IdProduct, IdOrder, Amount, Price, CreatedAt) VALUES
+(1, 1, 1, 125, 3187.50, GETDATE()),
+(2, 2, 2, 200, 9000.00, GETDATE()),
+(3, 3, 3, 50, 1540.00, GETDATE()),
+(4, 4, 4, 300, 4500.00, GETDATE()),
+(5, 5, 5, 100, 1275.00, GETDATE());
