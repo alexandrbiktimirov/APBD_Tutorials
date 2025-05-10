@@ -5,7 +5,7 @@ namespace Tutorial9.Services;
 public interface IDbService
 {
     Task<int> PutProduct(WarehouseDto dto);
-    Task ProcedureAsync();
+    Task<int> ProcedureAsync(WarehouseDto dto);
     Task<int> GetProductPrice(int idProduct);
     Task<int> GetOrderId(WarehouseDto dto);
     Task<int> OrderCompleted(WarehouseDto dto);

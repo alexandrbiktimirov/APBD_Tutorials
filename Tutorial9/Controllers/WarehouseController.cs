@@ -1,5 +1,6 @@
 using System.Transactions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.JSInterop.Infrastructure;
 using Tutorial9.Exceptions;
@@ -46,6 +47,23 @@ namespace Tutorial9.Controllers
             }
             
             return Ok(id);
+        }
+        
+        [HttpPut("procedure")]
+        public async Task<IActionResult> PutProductProcedure(WarehouseDto dto)
+        {
+            int result;
+
+            try
+            {
+                result = await _dbService.ProcedureAsync(dto);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
+            return Ok(result);
         }
     }
 }

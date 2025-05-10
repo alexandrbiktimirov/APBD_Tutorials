@@ -55,8 +55,7 @@ public class DbService : IDbService
         var orderId = await GetOrderId(dto);
         completedOrderCommand.Parameters.AddWithValue("@id", orderId);
 
-        var result = await completedOrderCommand.ExecuteNonQueryAsync();
-        return result;
+        return Convert.ToInt32(await completedOrderCommand.ExecuteScalarAsync());
     }
 
     public async Task<int> PutProduct(WarehouseDto dto)
@@ -67,7 +66,7 @@ public class DbService : IDbService
         var productPrice = await GetProductPrice(dto.IdProduct);
         var idOrder = await GetOrderId(dto);
         var orderHasBeenCompleted = await OrderCompleted(dto);
-        if (orderHasBeenCompleted == 1)
+        if (orderHasBeenCompleted > 0)
         {
             throw new OrderHasBeenCompletedException("Order has already been completed");
         }
@@ -80,8 +79,9 @@ public class DbService : IDbService
         
         try
         {
-            command.CommandText = "UPDATE [Order] SET FulfilledAt = @time;";
+            command.CommandText = "UPDATE [Order] SET FulfilledAt = @time WHERE IdOrder = @idOrder;";
             command.Parameters.AddWithValue("@time", DateTime.Now);
+            command.Parameters.AddWithValue("@idOder", idOrder);
             
             await command.ExecuteNonQueryAsync();
             
@@ -107,7 +107,7 @@ public class DbService : IDbService
         }
     }
 
-    public async Task ProcedureAsync()
+    public async Task<int> ProcedureAsync(WarehouseDto dto)
     {
         await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
         await using SqlCommand command = new SqlCommand();
@@ -115,12 +115,14 @@ public class DbService : IDbService
         command.Connection = connection;
         await connection.OpenAsync();
         
-        command.CommandText = "NameOfProcedure";
+        command.CommandText = "AddProductToWarehouse";
         command.CommandType = CommandType.StoredProcedure;
         
-        command.Parameters.AddWithValue("@Id", 2);
-        
-        await command.ExecuteNonQueryAsync();
-        
+        command.Parameters.AddWithValue("@IdProduct", dto.IdProduct);
+        command.Parameters.AddWithValue("@IdWarehouse", dto.IdWarehouse);
+        command.Parameters.AddWithValue("@Amount", dto.Amount);
+        command.Parameters.AddWithValue("@CreatedAt", dto.CreatedAt);
+
+        return Convert.ToInt32(await command.ExecuteScalarAsync());
     }
 }
