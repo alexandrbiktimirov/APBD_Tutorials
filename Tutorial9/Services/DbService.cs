@@ -49,13 +49,26 @@ public class DbService : IDbService
     public async Task<int> OrderCompleted(WarehouseDto dto)
     {
         await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
-        await using SqlCommand completedOrderCommand = new SqlCommand("SELECT 1 FROM Product_Warehouse WHERE IdOrder = @id", connection);
+        await using SqlCommand completedOrderCommand = new SqlCommand("SELECT COUNT(*) FROM Product_Warehouse WHERE IdOrder = @id", connection);
         await connection.OpenAsync();
         
         var orderId = await GetOrderId(dto);
         completedOrderCommand.Parameters.AddWithValue("@id", orderId);
 
         return Convert.ToInt32(await completedOrderCommand.ExecuteScalarAsync());
+    }
+
+    public async Task<bool> DoesWarehouseExist(int idWarehouse)
+    {
+        await using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        await using SqlCommand command =
+            new SqlCommand("SELECT 1 FROM Warehouse WHERE IdWarehouse = @idWarehouse", connection);
+        
+        await connection.OpenAsync();
+
+        command.Parameters.AddWithValue("@idWarehouse", idWarehouse);
+        var result = Convert.ToInt32(await command.ExecuteScalarAsync());
+        return result == 1;
     }
 
     public async Task<int> PutProduct(WarehouseDto dto)
@@ -70,6 +83,14 @@ public class DbService : IDbService
         {
             throw new OrderHasBeenCompletedException("Order has already been completed");
         }
+        if (dto.Amount <= 0)
+        {
+            throw new AmountIsNotGreaterThanZeroException("Amount has to be greater than 0");
+        }
+        if (!await DoesWarehouseExist(dto.IdWarehouse))
+        {
+            throw new WarehouseDoesNotExistException("Warehouse does not exist");
+        }
         
         command.Connection = connection;
         await connection.OpenAsync();
@@ -81,7 +102,7 @@ public class DbService : IDbService
         {
             command.CommandText = "UPDATE [Order] SET FulfilledAt = @time WHERE IdOrder = @idOrder;";
             command.Parameters.AddWithValue("@time", DateTime.Now);
-            command.Parameters.AddWithValue("@idOder", idOrder);
+            command.Parameters.AddWithValue("@idOrder", idOrder);
             
             await command.ExecuteNonQueryAsync();
             

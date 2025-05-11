@@ -91,11 +91,4 @@ INSERT INTO "Order"(IdProduct, Amount, CreatedAt) VALUES
 (4, 300, GETDATE()),
 (5, 100, GETDATE());
 
-GO
-
-INSERT INTO Product_Warehouse(IdWarehouse, IdProduct, IdOrder, Amount, Price, CreatedAt) VALUES
-(1, 1, 1, 125, 3187.50, GETDATE()),
-(2, 2, 2, 200, 9000.00, GETDATE()),
-(3, 3, 3, 50, 1540.00, GETDATE()),
-(4, 4, 4, 300, 4500.00, GETDATE()),
-(5, 5, 5, 100, 1275.00, GETDATE());
+DELETE FROM Product_Warehouse;

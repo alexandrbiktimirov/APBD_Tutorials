@@ -24,7 +24,7 @@ namespace Tutorial9.Controllers
         public async Task<IActionResult> PutProduct(WarehouseDto dto)
         {
             int id;
-            
+
             try
             {
                 id = await _dbService.PutProduct(dto);
@@ -38,6 +38,14 @@ namespace Tutorial9.Controllers
                 return BadRequest(e.Message);
             }
             catch (OrderHasBeenCompletedException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (AmountIsNotGreaterThanZeroException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (WarehouseDoesNotExistException e)
             {
                 return BadRequest(e.Message);
             }

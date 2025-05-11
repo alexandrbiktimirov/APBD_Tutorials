@@ -9,4 +9,5 @@ public interface IDbService
     Task<int> GetProductPrice(int idProduct);
     Task<int> GetOrderId(WarehouseDto dto);
     Task<int> OrderCompleted(WarehouseDto dto);
+    Task<bool> DoesWarehouseExist(int idWarehouse);
 }
