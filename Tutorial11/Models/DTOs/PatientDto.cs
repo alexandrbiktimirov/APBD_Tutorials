@@ -1,18 +1,9 @@
-using System.ComponentModel.DataAnnotations;
+namespace Tutorial11.Models.DTOs;
 
-namespace Tutorial11.Models;
-
-public class Patient
+public class PatientDto
 {
-    [Key]
     public int IdPatient { get; set; }
-    
-    [Required]
     public string FirstName { get; set; }
-    
-    [Required]
     public string LastName { get; set; }
-    
-    [Required]
     public DateTime BirthDate { get; set; }
 }

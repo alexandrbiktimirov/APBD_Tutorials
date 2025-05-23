@@ -1,9 +1,12 @@
-﻿namespace Tutorial11.DTOs;
+using Tutorial11.DTOs;
 
-public class PatientDto
+namespace Tutorial11.Models.DTOs;
+
+public class PatientDataDto
 {
     public int IdPatient { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public DateTime BirthDate { get; set; }
+    public List<PrescriptionDto> Prescriptions { get; set; }
 }
